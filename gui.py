@@ -59,8 +59,6 @@ class NonogramGUI:
                 # imposta lo sfondo della cella in base allo stato
                 if value == 1:
                     color = "black"
-                elif value == 0:
-                    color = "lightgray"
                 else:
                     color = "white"
                 
@@ -81,12 +79,10 @@ class NonogramGUI:
         current = self.model.get_cell(r, c)
 
         # imposta il ciclo di click tale che: None -> Pieno -> Vuoto -> None
-        if current is None:
+        if current == 0:
             new = 1
-        elif current == 1:
-            new = 0
         else:
-            new = None
+            new = 0
         
         self.model.set_cell(r, c, new)
 

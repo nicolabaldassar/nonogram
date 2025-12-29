@@ -8,7 +8,7 @@ class Nonogram:
         # None = non deciso
         # 1 = cella piena
         # 0 = cella vuota
-        self.grid = [[None for _ in range(cols)] for _ in range(rows)]
+        self.grid = [[0 for _ in range(cols)] for _ in range(rows)]
 
         # indizi: lista di liste
         self.row_hints = row_hints
@@ -16,7 +16,7 @@ class Nonogram:
     
     # funzione per impostare il valore di una cella
     def set_cell(self, r: int, c: int, value: int) -> None:
-        if value not in (0, 1, None):
+        if value not in (0, 1):
             raise ValueError("Valore cella non valido.")
         self.grid[r][c] = value
 
@@ -26,8 +26,6 @@ class Nonogram:
     
     # dati dei vettori di 0 e 1 restituisce le sequenze di 1 consecutivi
     def extract_groups(self, line:list) -> list:
-        if None in line:
-            return None
         groups = []
         count = 0
 
