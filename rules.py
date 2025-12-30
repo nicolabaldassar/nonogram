@@ -1,3 +1,5 @@
+import random
+
 class Nonogram:
     def __init__(self, rows: int, cols: int, row_hints: list, col_hints: list):
         # settare la dimensione della griglia
@@ -5,9 +7,9 @@ class Nonogram:
         self.cols = cols
 
         # valori griglia:
-        # None = non deciso
         # 1 = cella piena
         # 0 = cella vuota
+        # -1 = cella vuota ma con la X
         self.grid = [[0 for _ in range(cols)] for _ in range(rows)]
 
         # indizi: lista di liste
@@ -16,7 +18,7 @@ class Nonogram:
     
     # funzione per impostare il valore di una cella
     def set_cell(self, r: int, c: int, value: int) -> None:
-        if value not in (0, 1):
+        if value not in [0, 1, -1]:
             raise ValueError("Valore cella non valido.")
         self.grid[r][c] = value
 
@@ -25,7 +27,8 @@ class Nonogram:
         return self.grid[r][c]
     
     # dati dei vettori di 0 e 1 restituisce le sequenze di 1 consecutivi
-    def extract_groups(self, line:list) -> list:
+    @staticmethod
+    def extract_groups(line:list) -> list:
         groups = []
         count = 0
 
@@ -53,7 +56,7 @@ class Nonogram:
         extracted = self.extract_groups(col)
         if extracted is None:
             return None
-        return extracted == self.col_hints(c)
+        return extracted == self.col_hints[c]
     
     # controlla se tutte le righe e colonne rispetto gli indizi
     def is_solved(self) -> bool:
@@ -65,3 +68,6 @@ class Nonogram:
                 return False
         return True
     
+    # permette di resettare la griglia
+    def reset(self):
+        self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]

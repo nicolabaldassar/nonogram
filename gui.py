@@ -1,5 +1,7 @@
 import tkinter as tk
+import generator
 from rules import Nonogram
+from tkinter import messagebox
 
 # dimensione in pixel di ogni cella
 CELL_SIZE = 40
@@ -19,69 +21,117 @@ def center_window(win):
     win.geometry(f"{width}x{height}+{x}+{y}")
 
 class NonogramGUI:
-    def __init__(self, master, model: Nonogram):
+    def __init__(self, master):
         self.master = master
-        self.model = model
 
         # titolo finestra
         master.title("Nonogram")
 
-        self.margin = 40
+        self.margin = 80
 
         # canvas dove si disegna la griglia
-        self.canvas = tk.Canvas(
-            master,
-            width = model.cols * CELL_SIZE + self.margin * 2,
-            height = model.rows * CELL_SIZE + self.margin * 2,
-            bg = "white"
-        )
+        self.canvas = tk.Canvas(master, bg="white")
         self.canvas.pack()
 
-        # disegna la griglia
-        self.draw_grid()
+        self.button_frame = tk.Frame(master)
+        self.button_frame.pack(pady=20)
 
-        # aggiunge l'evento click sulle celle
+        # pulsanti
+        self.btn_reset = tk.Button(
+            self.button_frame,
+            text="Reset",
+            command=self.reset_game,
+            width=10
+        )
+        self.btn_reset.pack(side=tk.LEFT, padx=10)
+
+        self.btn_gen = tk.Button(
+            self.button_frame,
+            text="Genera",
+            command=self.start_new_level,
+            width=10
+        )
+        self.btn_gen.pack(side = tk.LEFT, padx=10)
+
+        self.btn_solve = tk.Button(
+            self.button_frame,
+            text="Risolvi",
+            command=self.solve_game,
+            width=10,
+            fg="blue"
+        )
+        self.btn_solve.pack(side=tk.LEFT, padx=10)
+
+        # genera il primo livello all'apertura del programma
+        self.start_new_level()
+
+    # <--- CORRETTO: Ora questa funzione è fuori da __init__
+    def start_new_level(self):
+        # 1. Crea il nuovo modello
+        self.model = generator.crea_livello_casuale(rows=8, cols=8, density=0.55)
+        
+        # 2. Calcola le nuove dimensioni
+        w = self.model.cols * CELL_SIZE + self.margin * 2
+        h = self.model.rows * CELL_SIZE + self.margin * 2
+
+        self.canvas.config(width=w, height=h)
+        
+        # 3. FONDAMENTALE: Ridisegna la griglia e riattiva il click
+        self.draw_grid()
         self.canvas.bind("<Button-1>", self.on_click)
+        
+        # 4. Centra la finestra
+        center_window(self.master)
 
     # disegna la griglia e contenuto delle celle
     def draw_grid(self):
         self.canvas.delete("all")
+        
+        # distanza in pixel tra un numero e l'altro
+        text_step = 15
+        font_conf = ("Arial", 10)
 
-        # disegniamo gli indizi per ogni colonna
+        # disegno gli indizi sopra le colonne
         for c in range(self.model.cols):
             hint = self.model.col_hints[c]
-            if isinstance(hint, int):
-                text = str(hint)
-            else:
-                text = " ".join(map(str, hint))
-            x = c * CELL_SIZE + self.margin + CELL_SIZE/2
-            total_height = len(hint) * 12
-            start_y = self.margin/2 - total_height/2
-
-            for i, num in enumerate(hint):
-                y = start_y + i * 12
+            # se è un numero singolo, lo trasformo in lista per trattarlo uguale
+            if isinstance(hint, int): 
+                hint = [hint]
+            
+            x = (c * CELL_SIZE) + self.margin + (CELL_SIZE / 2)
+            
+            # ciclo al contrario 
+            for i, num in enumerate(hint[::-1]):
+                y = self.margin - 4 - (i * text_step)
+                
                 self.canvas.create_text(
                     x, y,
                     text=str(num),
                     fill="black",
-                    font=("Arial", 10)
+                    font=font_conf,
+                    anchor="s"
                 )
             
-        # disegniamo gli indizi per ogni riga
+        # disegno gli indizi a sinistra delle righe
         for r in range(self.model.rows):
             hint = self.model.row_hints[r]
-            if isinstance(hint, int):
-                text = str(hint)
-            text = " ".join(map(str, hint))
-            x = self.margin / 2
-            y = r * CELL_SIZE + self.margin + CELL_SIZE / 2
-            self.canvas.create_text(
-                x, y,
-                text=text,
-                fill="black",
-                font=("Arial", 10)
-            )
+            if isinstance(hint, int): 
+                hint = [hint]
 
+            y = (r * CELL_SIZE) + self.margin + (CELL_SIZE / 2)
+
+            for i, num in enumerate(hint[::-1]):
+                x = self.margin - 8 - (i * text_step)
+                
+                self.canvas.create_text(
+                    x, y,
+                    text=str(num),
+                    fill="black",
+                    font=font_conf,
+                    anchor="e"
+                )
+
+        # disegno la griglia
         for r in range(self.model.rows):
             for c in range(self.model.cols):
                 x1 = (c * CELL_SIZE) + self.margin
@@ -91,17 +141,33 @@ class NonogramGUI:
 
                 value = self.model.get_cell(r, c)
 
-                # imposta lo sfondo della cella in base allo stato
+                text = ""
+                text_color = ""
+
                 if value == 1:
-                    color = "black"
+                    fill_color = "black"
+                elif value == -1:
+                    fill_color = "white"
+                    text = "X"
+                    text_color = "red"
                 else:
-                    color = "white"
+                    fill_color = "white"
                 
                 self.canvas.create_rectangle(
                     x1, y1, x2, y2, 
-                    fill = color,
+                    fill = fill_color,
                     outline = "gray"
                 )
+
+                if text:
+                    self.canvas.create_text(
+                        (x1 + x2) / 2,
+                        (y1 + y2) / 2,
+                        text=text,
+                        fill=text_color,
+                        font=("Arial", 20, "bold")
+                    )
+
 
     # gestione click del mouse
     def on_click(self, event):
@@ -113,9 +179,11 @@ class NonogramGUI:
         
         current = self.model.get_cell(r, c)
 
-        # imposta il ciclo di click tale che: None -> Pieno -> Vuoto -> None
+        # imposta il ciclo di click tale che: 0 -> 1 -> -1 -> 0
         if current == 0:
             new = 1
+        elif current == 1:
+            new = -1
         else:
             new = 0
         
@@ -124,18 +192,24 @@ class NonogramGUI:
         # ridisegna la cella
         self.draw_grid()
 
+        # questo comando serve per colorare l'ultima cella prima del messaggio di vittoria
+        self.master.update_idletasks()
 
+        if self.model.is_solved():
+            messagebox.showinfo("Complimenti!", "Puzzle risolto correttamente!")
+            # Quando clicchi OK, ne genera uno nuovo
+            self.start_new_level()
 
+    # funzioni pulsanti
+    def reset_game(self):
+        self.model.reset()
+        self.draw_grid()
+
+    def solve_game(self):
+        messagebox.showinfo("Risolvi", "Funzione solver non ancora implementata")
 
 if __name__ == "__main__":
-    model = Nonogram(
-        8, 8,
-        row_hints=[[1], [3], [1,1], [5], [2], [1], [3], [1,1]],
-        col_hints=[[2], [2], [1, 1], [3], [1], [1], [3], [1,1]]
-    )
     root = tk.Tk()
-    gui = NonogramGUI(root, model)
-    
-    center_window(root)
-
+    gui = NonogramGUI(root)
+    # Non serve chiamare center_window qui, lo fa start_new_level
     root.mainloop()
