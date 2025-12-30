@@ -2,6 +2,7 @@ import tkinter as tk
 import generator
 from rules import Nonogram
 from tkinter import messagebox
+from sat_solver import solve_nonogram
 
 # dimensione in pixel di ogni cella
 CELL_SIZE = 40
@@ -204,4 +205,30 @@ class NonogramGUI:
         self.draw_grid()
 
     def solve_game(self):
-        messagebox.showinfo("Risolvi", "Funzione solver non ancora implementata")
+        # per far capire che sta elaborando cambiamo il cursore
+        self.master.config(cursor="watch")
+        self.master.update()
+
+        # passiamo i dati del modello attuale al solver
+        solution = solve_nonogram(
+            self.model.rows,
+            self.model.cols,
+            self.model.row_hints,
+            self.model.col_hints
+        )
+
+        # ripristiniamo ora il cursore normale
+        self.master.config(cursor="")
+
+        if solution:
+            # se c'è una soluzione mettiamo i valori nella griglia
+            for r in range(self.model.rows):
+                for c in range(self.model.cols):
+                    self.model.set_cell(r, c, solution[r][c])
+            
+            # ridisegniamo
+            self.draw_grid()
+            messagebox.showinfo("Z3 Solver", "Soluzione trovata!")
+        else:
+            # in caso non trovi la soluzione, anche se impossibile dato che generiamo i livelli
+            messagebox.showerror("Errore", "Z3 non ha trovato soluzioni.")
