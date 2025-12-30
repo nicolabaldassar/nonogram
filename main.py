@@ -11,7 +11,7 @@ def avvia_gioco(dimensione):
 def main():
     global root
     root = tk.Tk()
-    root.title("menu Nonogramma")
+    root.title("Menu Nonogramma")
 
     width=300
     height=400
@@ -26,9 +26,14 @@ def main():
     tk.Label(root, text="Scegli la dimensione", font=("Arial", 14, "bold")).pack(pady=20)
 
     for i in range(6, 13):
+        if i == 8:
+            testo_bottone = f"{i}x{i} (consigliato)"
+        else:
+            testo_bottone = f"{i}x{i}"
+
         btn = tk.Button(
             root,
-            text=f"{i}x{i}",
+            text=testo_bottone,
             font=("Arial", 11),
             width=20,
             command=lambda d=i: avvia_gioco(d)
