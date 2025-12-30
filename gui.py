@@ -68,7 +68,7 @@ class NonogramGUI:
     # <--- CORRETTO: Ora questa funzione è fuori da __init__
     def start_new_level(self):
         # 1. Crea il nuovo modello
-        self.model = generator.crea_livello_casuale(rows=8, cols=8, density=0.55)
+        self.model = generator.crea_livello_casuale(rows=6, cols=6, density=0.5)
         
         # 2. Calcola le nuove dimensioni
         w = self.model.cols * CELL_SIZE + self.margin * 2
