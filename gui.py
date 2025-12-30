@@ -47,6 +47,41 @@ class NonogramGUI:
     def draw_grid(self):
         self.canvas.delete("all")
 
+        # disegniamo gli indizi per ogni colonna
+        for c in range(self.model.cols):
+            hint = self.model.col_hints[c]
+            if isinstance(hint, int):
+                text = str(hint)
+            else:
+                text = " ".join(map(str, hint))
+            x = c * CELL_SIZE + self.margin + CELL_SIZE/2
+            total_height = len(hint) * 12
+            start_y = self.margin/2 - total_height/2
+
+            for i, num in enumerate(hint):
+                y = start_y + i * 12
+                self.canvas.create_text(
+                    x, y,
+                    text=str(num),
+                    fill="black",
+                    font=("Arial", 10)
+                )
+            
+        # disegniamo gli indizi per ogni riga
+        for r in range(self.model.rows):
+            hint = self.model.row_hints[r]
+            if isinstance(hint, int):
+                text = str(hint)
+            text = " ".join(map(str, hint))
+            x = self.margin / 2
+            y = r * CELL_SIZE + self.margin + CELL_SIZE / 2
+            self.canvas.create_text(
+                x, y,
+                text=text,
+                fill="black",
+                font=("Arial", 10)
+            )
+
         for r in range(self.model.rows):
             for c in range(self.model.cols):
                 x1 = (c * CELL_SIZE) + self.margin
@@ -95,8 +130,8 @@ class NonogramGUI:
 if __name__ == "__main__":
     model = Nonogram(
         8, 8,
-        row_hints=[[1], 3, [1,1], [5], [2], [1], 3, [1,1]],
-        col_hints=[[2], [2], [1, 1], [3], [1], [1], 3, [1,1]]
+        row_hints=[[1], [3], [1,1], [5], [2], [1], [3], [1,1]],
+        col_hints=[[2], [2], [1, 1], [3], [1], [1], [3], [1,1]]
     )
     root = tk.Tk()
     gui = NonogramGUI(root, model)
