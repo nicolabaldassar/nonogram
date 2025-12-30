@@ -8,6 +8,8 @@ CELL_SIZE = 40
 
 # centra la finestra e aggiungici dello spazio tra i bordi della finestra e la griglia
 def center_window(win):
+    win.geometry("")
+
     win.update_idletasks()
 
     width = win.winfo_width()
@@ -21,11 +23,12 @@ def center_window(win):
     win.geometry(f"{width}x{height}+{x}+{y}")
 
 class NonogramGUI:
-    def __init__(self, master):
+    def __init__(self, master, size=8):
         self.master = master
+        self.size = size
 
         # titolo finestra
-        master.title("Nonogram")
+        master.title(f"Nonogramma {size}x{size}")
 
         self.margin = 80
 
@@ -65,22 +68,17 @@ class NonogramGUI:
         # genera il primo livello all'apertura del programma
         self.start_new_level()
 
-    # <--- CORRETTO: Ora questa funzione è fuori da __init__
     def start_new_level(self):
-        # 1. Crea il nuovo modello
-        self.model = generator.crea_livello_casuale(rows=6, cols=6, density=0.5)
+        self.model = generator.crea_livello_casuale(rows=self.size, cols=self.size, density=0.5)
         
-        # 2. Calcola le nuove dimensioni
         w = self.model.cols * CELL_SIZE + self.margin * 2
         h = self.model.rows * CELL_SIZE + self.margin * 2
 
         self.canvas.config(width=w, height=h)
         
-        # 3. FONDAMENTALE: Ridisegna la griglia e riattiva il click
         self.draw_grid()
         self.canvas.bind("<Button-1>", self.on_click)
         
-        # 4. Centra la finestra
         center_window(self.master)
 
     # disegna la griglia e contenuto delle celle
@@ -207,9 +205,3 @@ class NonogramGUI:
 
     def solve_game(self):
         messagebox.showinfo("Risolvi", "Funzione solver non ancora implementata")
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    gui = NonogramGUI(root)
-    # Non serve chiamare center_window qui, lo fa start_new_level
-    root.mainloop()
