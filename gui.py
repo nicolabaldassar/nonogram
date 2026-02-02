@@ -217,18 +217,30 @@ class NonogramGUI:
             self.model.col_hints
         )
 
-        # ripristiniamo ora il cursore normale
-        self.master.config(cursor="")
-
         if solution:
-            # se c'è una soluzione mettiamo i valori nella griglia
-            for r in range(self.model.rows):
-                for c in range(self.model.cols):
-                    self.model.set_cell(r, c, solution[r][c])
-            
-            # ridisegniamo
-            self.draw_grid()
-            messagebox.showinfo("Z3 Solver", "Soluzione trovata!")
+            # avvia animazione
+            self.animate_solution(solution, 0, 0)
         else:
             # in caso non trovi la soluzione, anche se impossibile dato che generiamo i livelli
             messagebox.showerror("Errore", "Z3 non ha trovato soluzioni.")
+
+    def animate_solution(self, solution, r, c):
+        # imposta cella corrente
+        self.model.set_cell(r, c, solution[r][c])
+
+        self.draw_grid()
+
+        # calcola prossima cella
+        next_c = c + 1
+        next_r = r
+        if next_c >= self.model.cols:
+            next_c = 0
+            next_r += 1
+        
+        # se ci sono altre celle richiama la funzione 0.001 sec dopo
+        if next_r < self.model.rows:
+            self.master.after(10, lambda: self.animate_solution(solution, next_r, next_c))
+        else:
+            # finite le celle
+            self.master.config(cursor="")
+            messagebox.showinfo("Z3 Solver", "Soluzione trovata!")
