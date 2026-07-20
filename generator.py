@@ -9,13 +9,13 @@ def crea_livello_casuale(rows=8, cols=8, density=0.5):
             # decide in base alla densità quanti 0 e 1 mettere
             val = 1 if random.random() < density else 0
             row_data.append(val)
-        temp_grid.append(row_data) # <--- CORRETTO (era temp.grid)
+        temp_grid.append(row_data)
     
     # calcola gli indizi in base alla griglia generata
     row_hints = []
     for r in range(rows):
         hints = Nonogram.extract_groups(temp_grid[r])
-        row_hints.append(hints) # <--- CORRETTO (Mancava questa riga!)
+        row_hints.append(hints)
 
     col_hints = []
     for c in range(cols):
