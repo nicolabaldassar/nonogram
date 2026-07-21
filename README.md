@@ -1,16 +1,16 @@
-# Nonogramma (Picross) in Python
+# Nonogramma in Python
 
 ## Descrizione del progetto
 
-Questo progetto è stato sviluppato come lavoro per il corso di **Computabilità, Complessità e Logica** (2° anno, corso di laurea AIDA).
+Questo progetto è stato sviluppato come lavoro per il corso di Computabilità, Complessità e Logica.
 
-Si tratta di un'implementazione del gioco del **Nonogramma** (noto anche come *Picross* o *Griddler*), un puzzle logico in cui il giocatore deve colorare le celle di una griglia seguendo gli indizi numerici posti a lato di ogni riga e colonna, fino a formare un'immagine.
+Si tratta di un'implementazione del gioco del **Nonogramma**, un puzzle logico in cui il giocatore deve colorare le celle di una griglia seguendo gli indizi numerici posti a lato di ogni riga e colonna,.
 
 Il progetto integra tre componenti principali:
 
 - **Interfaccia grafica** realizzata con `tkinter`, che permette di giocare cliccando sulle celle della griglia (click sinistro per ciclare tra cella piena, cella con "X" e cella vuota).
 - **Generatore di livelli casuali**, che crea griglie di gioco casuali e ne calcola automaticamente gli indizi corrispondenti.
-- **Risolutore automatico basato su Z3**, un SAT/SMT solver, che modella il puzzle come un problema di soddisfacibilità di vincoli (constraint satisfaction) e trova una soluzione valida, mostrata poi tramite un'animazione cella per cella.
+- **Risolutore automatico basato su Z3**, un SAT solver, che modella il puzzle come un problema di soddisfacibilità di vincoli e trova una soluzione valida.
 
 ## Come si usa
 
