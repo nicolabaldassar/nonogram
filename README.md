@@ -1,4 +1,4 @@
-# Nonogramma in Python
+# Nonogramma
 
 ## Descrizione del progetto
 
